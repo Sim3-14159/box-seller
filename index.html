@@ -1,16 +1,196 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <title>Simple Orpheus Example - Github Pages</title>
+  <meta charset="UTF-8" />
+  <title>Cozy Seller's House</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Comic+Neue&display=swap');
+    .title {
+      font-size: 2rem;
+      font-weight: bold;
+      color: #dd9;
+      text-align: center;
+      margin-bottom: 20px;
+      text-shadow: 2px 2px 4px #3a2c1d;
+    }
+
+    body {
+      margin: 0;
+      padding: 40px 20px;
+      font-family: 'Comic Neue', cursive, Comic Sans MS, sans-serif;
+      background: linear-gradient(135deg, #a56c3c 0%, #603813 100%);
+      color: #3a2c1d;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      user-select: none;
+    }
+
+    #conversation-container {
+      background: #fdf2d0;
+      box-shadow: inset 0 0 20px #c9b89e;
+      border-radius: 15px;
+      width: 90%;
+      max-width: 600px;
+      min-height: 400px;
+      padding: 20px 30px;
+      overflow-y: auto;
+      border: 4px solid #7f5a28;
+      font-size: 1.1rem;
+      line-height: 1.5;
+      font-weight: 500;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    #conversation p.user-message {
+      background: #e9c46a;
+      color: #4a2c0e;
+      margin-left: auto;
+      font-family: 'Comic Neue', cursive;
+      font-weight: 700;
+      box-shadow: 1px 1px 8px #a57705;
+      max-width: 75%;
+      padding: 8px 12px;
+      border-radius: 12px;
+      text-align: right;
+    }
+
+    #conversation p.bot-message {
+      background: #f3e1a8;
+      color: #6b4f1d;
+      font-family: 'Comic Neue', cursive;
+      font-style: italic;
+      font-weight: 600;
+      box-shadow: 1px 1px 8px #9b7f23;
+      max-width: 75%;
+      padding: 8px 12px;
+      border-radius: 12px;
+      text-align: left;
+      margin-right: auto;
+    }
+
+    #conversation p.win-message {
+      background: #b0e57c;
+      color: #274c00;
+      font-family: 'Comic Neue', cursive;
+      font-weight: bold;
+      text-align: center;
+      padding: 10px;
+      border-radius: 12px;
+      box-shadow: 1px 1px 10px #6a972e;
+      width: fit-content;
+      margin: 0 auto;
+    }
+
+    #input {
+      margin-top: 20px;
+      width: 90%;
+      max-width: 600px;
+      height: 80px;
+      padding: 15px 20px;
+      font-size: 1.2rem;
+      border-radius: 15px;
+      border: 3px solid #7f5a28;
+      box-shadow: inset 2px 2px 5px #d1b78f;
+      font-family: 'Comic Neue', cursive;
+      resize: none;
+      background: #fff9db;
+      color: #3a2c1d;
+      outline: none;
+      transition: border-color 0.3s ease;
+    }
+
+    #input:focus {
+      border-color: #e9c46a;
+      box-shadow: 0 0 10px #e9c46a;
+      background: #fffbe2;
+    }
+  </style>
 </head>
 <body>
-  <style>
-    /* Custom Font Code Goes Here */
-  </style>
-  <p>Say 'Hi' to start:</p>
-  <div id="conversation"></div>
-  <textarea id="input"></textarea>
-  <script src="https://orpheusjs.vercel.app/wizard_orpheus"></script>
-   <script src="index.js"></script>
+  <p class="title">You need a high quality cardboard box, but you only have $30</p>
+
+  <div id="conversation-container">
+    <div id="conversation"></div>
+  </div>
+
+  <textarea id="input" placeholder="Type your message..."></textarea>
+
+  <script src="/wizard_orpheus.js"></script>
+  <script>  
+    let game = new WizardOrpheus('sk-test', `
+      You are a friendly shopkeeper selling a high-quality cardboard box for $50. Your name is Henry.
+      You try to be kind, but you don't like being pushed too hard. If a user tries to haggle, resist at first,
+      but you might eventually reduce the price.
+      Sometimes you may get a bit angry at the person, but only if they offer something ridiculous or they insult you; even if you are angry, don't say bad words.
+
+      Each time you agree to a lower price, make sure to:
+      - Say it in your message (e.g., "Fine, I’ll let it go for $35"), but don't give a generic "price updated to some
+      amount".
+      - Set the variable 'price' to that new number using setVariable('price', NEW_VALUE).
+
+      Only reduce the price when the user gives a strong enough reason, or seems desperate.
+    `)
+
+    game.variable('price', 'Current price', 50)
+    game.enablePriceCounter(true)
+    game.enableImageGeneration(true)
+
+    let hasWon = false
+
+    game.createUserAction({
+      name: 'sendMessage',
+      parameters: ['Message'],
+      howBotShouldHandle: 'Respond to the user'
+    })
+
+    function updatePriceTag() {
+      const price = game.getVariableValue('price')
+      if (price !== undefined) {
+        console.log(`Current price: $${price}`)
+
+        if (price <= 30 && !hasWon) {
+          hasWon = true
+          const conversation = document.getElementById('conversation')
+          const winMsg = document.createElement('p')
+          winMsg.className = 'win-message'
+          winMsg.textContent = 'You win!'
+          conversation.appendChild(winMsg)
+          conversation.parentElement.scrollTop = conversation.parentElement.scrollHeight
+        }
+      }
+    }
+
+    game.botAction('respond', 'Respond', { response: 'ok' }, data => {
+      const conversation = document.getElementById('conversation')
+      const p = document.createElement('p')
+      p.className = 'bot-message'
+      p.textContent = data.response
+      conversation.appendChild(p)
+      conversation.parentElement.scrollTop = conversation.parentElement.scrollHeight
+
+      // 🛠 Fix: Delay update to ensure price is updated
+      setTimeout(updatePriceTag, 100)
+    })
+
+    document.getElementById('input').addEventListener('keyup', function (e) {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault()
+        let userInput = this.value.trim()
+        if (!userInput) return
+        game.sendMessage(userInput)
+        const conversation = document.getElementById('conversation')
+        const pUser = document.createElement('p')
+        pUser.className = 'user-message'
+        pUser.textContent = 'You: ' + userInput
+        conversation.appendChild(pUser)
+        conversation.parentElement.scrollTop = conversation.parentElement.scrollHeight
+        this.value = ''
+      }
+    })
   </script>
 </body>
 </html>
