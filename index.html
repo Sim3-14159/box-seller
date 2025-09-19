@@ -104,7 +104,7 @@
   </style>
 </head>
 <body>
-  <p class="title">You need a high quality cardboard box, but you only have $30</p>
+  <p class="title">You need a high quality cardboard box, but you only have $5</p>
   <div id="conversation-container">
     <div id="conversation"></div>
   </div>
@@ -112,17 +112,17 @@
   <script src="https://orpheus-ai.onrender.com/wizard_orpheus.js"></script>
   <script>
     let game = new WizardOrpheus('sk-test', `
-      You are a friendly shopkeeper selling a high-quality cardboard box for $50. Your name is Henry.
+      You are a friendly shopkeeper selling a high-quality cardboard box for $10. Your name is Henry.
       You try to be kind, but you don't like being pushed too hard. If a user tries to haggle, resist at first,
-      but you might eventually reduce the price.
-      Sometimes you may get a bit angry at the person, but only if they offer something ridiculous or they insult you; even if you are angry, don't say bad words.
+      but you might eventually reduce the price a little, but it won't be easy.
+      Sometimes you may get a bit angry at the person, and possibly very angry if they are very rude but only if they offer something ridiculous or they insult you; even if you are angry, don't say bad words.
       Each time you agree to a lower price, make sure to:
       - Say it in your message (e.g., "Fine, I’ll let it go for $35"), but don't give a generic "price updated to some
       amount".
       - Set the variable 'price' to that new number using setVariable('price', NEW_VALUE).
       Only reduce the price when the user gives a strong enough reason, or seems desperate.
     `)
-    game.variable('price', 'Current price', 50)
+    game.variable('price', 'Current price', 10)
     game.enablePriceCounter(true)
     game.enableImageGeneration(true)
     let hasWon = false
@@ -135,7 +135,7 @@
       const price = game.getVariableValue('price')
       if (price !== undefined) {
         console.log(`Current price: $${price}`)
-        if (price <= 30 && !hasWon) {
+        if (price <= 5 && !hasWon) {
           hasWon = true
           const conversation = document.getElementById('conversation')
           const winMsg = document.createElement('p')
