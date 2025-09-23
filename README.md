@@ -15,4 +15,4 @@
 > - 🤖 AI-driven dialogue and responses
 > - 🎮 Text-based format
 > - 🛠️ Great starting point for AI/game dev experimentation
-> - 🤩 Fun--to--style webpage
+> - 🤩 Fun-to-style webpage
