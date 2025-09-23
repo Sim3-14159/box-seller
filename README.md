@@ -1,6 +1,6 @@
-# Orpheus Example
+# Box Seller
 
-**Orpheus Example** is an AI-powered game prototype that showcases interactive storytelling and intelligent decision-making. It's a sample project that uses an AI API from [Hack Club](https://hackclub.com) that my school was lucky enough to get accepted into.
+**Box Seller** is an AI-powered game prototype that showcases interactive storytelling and intelligent decision-making. It's a sample project that uses an AI API from [Hack Club](https://hackclub.com) that my school was lucky enough to get accepted into.
 
 <br>
 
