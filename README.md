@@ -7,7 +7,7 @@
 
 ## 🎮 How to play
 
-> Just go to [this link](https://Sim3-14159.github.io/orpheus-example) to see the website in action!
+> Just go to [this link](https://Sim3-14159.github.io/box-seller) to see the website in action!
 > Your goal is to convince the Seller to sell you his cardboard box for $3 or less---if you do, then you win!
 
 ## ✨ Features
