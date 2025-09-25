@@ -171,12 +171,18 @@
       const conversation = document.getElementById('conversation');
       const p = document.createElement('p');
       p.className = 'bot-message';
-      // Parse Markdown to HTML and render it with highlight.js
+      // Parse Markdown to HTML
       const html = marked.parse(data.response);
       p.innerHTML = html;
-      hljs.highlightAll();
       conversation.appendChild(p);
+    
+      // 🔧 Only highlight code blocks within this message
+      p.querySelectorAll('pre code').forEach((block) => {
+        hljs.highlightElement(block);
+      });
+    
       conversation.parentElement.scrollTop = conversation.parentElement.scrollHeight;
+    
       // Delay update to ensure price is updated
       setTimeout(updatePriceTag, 100);
     });
