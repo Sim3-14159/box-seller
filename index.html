@@ -101,7 +101,25 @@
       box-shadow: 0 0 10px #E9C46A;
       background: #FFFBE2;
     }
+    pre {
+      background: #EEE1A8;
+      padding: 10px;
+      border-radius: 8px;
+      overflow-x: auto;
+      font-family: monospace;
+      font-size: 0.95rem;
+    }
+    code {
+      font-family: monospace;
+    }
   </style>
+
+  <!-- Marked.js for Markdown parsing -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <!-- Highlight.js for code syntax highlighting -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-light.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+
 </head>
 <body>
   <p class="title">Your goal is to get Henry to sell you a cardboard box for $3 or less.</p>
@@ -109,6 +127,7 @@
     <div id="conversation"></div>
   </div>
   <textarea id="input" placeholder="Say something to Henry..."></textarea>
+
   <script src="https://orpheus-ai.onrender.com/wizard_orpheus.js"></script>
   <script>
     let game = new WizardOrpheus('sk-test', `
@@ -121,56 +140,62 @@
       amount".
       - Set the variable 'price' to that new number using setVariable('price', NEW_VALUE).
       Only reduce the price when the user gives a strong enough reason, or seems pretty desperate.
-    `)
-    game.variable('price', 'Current price', 10)
-    game.enablePriceCounter(true)
-    game.enableImageGeneration(true)
-    let hasWon = false
+    `);
+    game.variable('price', 'Current price', 10);
+    game.enablePriceCounter(true);
+    game.enableImageGeneration(true);
+    let hasWon = false;
     game.createUserAction({
       name: 'sendMessage',
       parameters: ['Message'],
       howBotShouldHandle: 'Respond to the user'
-    })
+    });
+
     function updatePriceTag() {
-      const price = game.getVariableValue('price')
+      const price = game.getVariableValue('price');
       if (price !== undefined) {
-        console.log(`Current price: $${price}`)
+        console.log(`Current price: $${price}`);
         if (price <= 3 && !hasWon) {
-          hasWon = true
-          const conversation = document.getElementById('conversation')
-          const winMsg = document.createElement('p')
-          winMsg.className = 'win-message'
-          winMsg.textContent = 'You win!'
-          conversation.appendChild(winMsg)
-          conversation.parentElement.scrollTop = conversation.parentElement.scrollHeight
+          hasWon = true;
+          const conversation = document.getElementById('conversation');
+          const winMsg = document.createElement('p');
+          winMsg.className = 'win-message';
+          winMsg.textContent = 'You win!';
+          conversation.appendChild(winMsg);
+          conversation.parentElement.scrollTop = conversation.parentElement.scrollHeight;
         }
       }
     }
+
     game.botAction('respond', 'Respond', { response: 'ok' }, data => {
-      const conversation = document.getElementById('conversation')
-      const p = document.createElement('p')
-      p.className = 'bot-message'
-      p.textContent = data.response
-      conversation.appendChild(p)
-      conversation.parentElement.scrollTop = conversation.parentElement.scrollHeight
-      // :hammer_and_wrench: Fix: Delay update to ensure price is updated
-      setTimeout(updatePriceTag, 100)
-    })
+      const conversation = document.getElementById('conversation');
+      const p = document.createElement('p');
+      p.className = 'bot-message';
+      // Parse Markdown to HTML and render it with highlight.js
+      const html = marked.parse(data.response);
+      p.innerHTML = html;
+      hljs.highlightAll();
+      conversation.appendChild(p);
+      conversation.parentElement.scrollTop = conversation.parentElement.scrollHeight;
+      // Delay update to ensure price is updated
+      setTimeout(updatePriceTag, 100);
+    });
+
     document.getElementById('input').addEventListener('keyup', function (e) {
       if (e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault()
-        let userInput = this.value.trim()
-        if (!userInput) return
-        game.sendMessage(userInput)
-        const conversation = document.getElementById('conversation')
-        const pUser = document.createElement('p')
-        pUser.className = 'user-message'
-        pUser.textContent = 'You: ' + userInput
-        conversation.appendChild(pUser)
-        conversation.parentElement.scrollTop = conversation.parentElement.scrollHeight
-        this.value = ''
+        e.preventDefault();
+        let userInput = this.value.trim();
+        if (!userInput) return;
+        game.sendMessage(userInput);
+        const conversation = document.getElementById('conversation');
+        const pUser = document.createElement('p');
+        pUser.className = 'user-message';
+        pUser.textContent = 'You: ' + userInput;
+        conversation.appendChild(pUser);
+        conversation.parentElement.scrollTop = conversation.parentElement.scrollHeight;
+        this.value = '';
       }
-    })
+    });
   </script>
 </body>
 </html>
